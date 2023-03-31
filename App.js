@@ -1,10 +1,28 @@
 import React, { useState } from "react";
 import { UserForm } from "./src/components/UserForm";
-import { Pressable, SafeAreaView, StyleSheet, Text, Modal } from "react-native";
-
+import { User } from "./src/components/User";
+import {
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  FlatList,
+} from "react-native";
 export default function App() {
-  const [modalVisible, setModalVisible] = useState(false);
   const [modalUserForm, setModalUserForm] = useState(false);
+  /* Creamos un array vacío para listar los usuarios */
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+  /* Creamos un objeto vacío que luego contendra la info de un user */
+  const [user, setUser] = useState({});
+
+  const editUser = (id) => {
+    console.log("Usuario leido por App.js", id);
+    /* Consultamos en el array de usuarios registrados el id */
+    const editUser = registeredUsers.filter((user) => user.id === id);
+    console.log("El array paciente que el filter obtiene es ", editUser);
+    setUser(editUser[0]);
+    console.log('No necesitamos el array, sólo el objeto', editUser[0])
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -13,19 +31,40 @@ export default function App() {
         <Text style={styles.titleBold}>UAM</Text>
       </Text>
 
-      <Pressable onPress={()=>setModalVisible(true)} style={styles.btnNewUser}>
+      <Pressable
+        onPress={() => setModalUserForm(true)}
+        style={styles.btnNewUser}
+      >
         <Text style={styles.titleButton}>Nuevo usuario</Text>
       </Pressable>
 
-      <Pressable onPress={()=>setModalUserForm(true)} style={styles.btnNewUser}>
-        <Text style={styles.titleButton}>Nuevo usuario</Text>
-      </Pressable>
-      <UserForm modalUserForm = {modalUserForm}></UserForm>
+      {registeredUsers.length === 0 ? (
+        <Text style={styles.textNoUser}>No hay usuarios registrados.</Text>
+      ) : (
+        <FlatList
+          style={styles.userList}
+          data={registeredUsers}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            /* console.log(item); */
+            return (
+              <User
+                item={item}
+                setModalUserForm={setModalUserForm}
+                editUser={editUser}
+              />
+            );
+          }}
+        />
+      )}
 
-      <Modal animationType="slide" visible={modalVisible}>
-        <Text>Desde modal</Text>
-      </Modal>
-
+      <UserForm
+        modalUserForm={modalUserForm}
+        setModalUserForm={setModalUserForm}
+        registeredUsers={registeredUsers}
+        setRegisteredUsers={setRegisteredUsers}
+        user={user}
+      />
     </SafeAreaView>
   );
 }
@@ -55,5 +94,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     color: "#000000",
+  },
+  textNoUser: {
+    marginTop: 40,
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: 400,
+    color: "#FFFFFF",
+  },
+  userList: {
+    marginTop: 50,
+    marginHorizontal: 30,
   },
 });
