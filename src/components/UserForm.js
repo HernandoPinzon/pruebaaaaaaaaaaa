@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   Modal,
@@ -9,12 +9,79 @@ import {
   View,
   ScrollView,
   Pressable,
+  Alert,
 } from "react-native";
 import DatePicker from "react-native-date-picker";
 
-export const UserForm = ({ modalUserForm }) => {
-  const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
+export const UserForm = ({
+  modalUserForm,
+  setModalUserForm,
+  registeredUsers,
+  setRegisteredUsers,
+  user: userObj,
+}) => {
+  const [fecha, setFecha] = useState(new Date());
+  const [id, setId] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [cellphone, setCellphone] = useState("");
+  const [comments, setComments] = useState("");
+
+  /* Como segundo parametro un array vacio: se ejecuta una sola vez */
+  useEffect(() => {
+    console.log("Entre al useEffect");
+    console.log("info del objeto user" + userObj.id);
+
+    if (Object.keys(userObj).length > 0) {
+      console.log("Entre al condicional del useEffect");
+      setId(userObj.id);
+      setUserName(userObj.userName);
+      setUserEmail(userObj.userEmail);
+      setCellphone(userObj.cellphone);
+      setComments(userObj.comments);
+      setFecha(userObj.fecha);
+    }
+  }, [userObj]);
+
+  const handleUser = () => {
+    if ([userName, userEmail, cellphone, comments].includes("")) {
+      Alert.alert("Error", "Hay campos sin diligenciar");
+      return;
+    }
+    /* Creamos un nuevo objeto con la información del usuario */
+    const newUser = {
+      /* Creamos un id ficticio a partir de la fecha */
+      userName,
+      userEmail,
+      cellphone,
+      fecha,
+      comments,
+    };
+
+    if (id) {
+      // Editar
+      newUser.id = id;
+      console.log("Editando", newUser);
+      const userEdited =  
+      return;
+    } else {
+      // Nuevo registro
+      newUser.id = Date.now();
+      setRegisteredUsers([...registeredUsers, newUser]);
+    }
+
+    /* Hace una copia del array de users y le agrega el nuevo */
+    setRegisteredUsers([...registeredUsers, newUser]);
+    setModalUserForm(!modalUserForm);
+    /* Se limpian los campos para que no quede el último registro */
+    setId("");
+    setUserName("");
+    setUserEmail("");
+    setCellphone("");
+    setFecha(new Date());
+    setComments("");
+  };
+
   return (
     <Modal animationType="slide" visible={modalUserForm}>
       <ImageBackground
@@ -30,51 +97,71 @@ export const UserForm = ({ modalUserForm }) => {
             Inscripción {""}
             <Text style={styles.titleBold}>Vacaciones UAM</Text>
           </Text>
+
+          <Pressable
+            style={styles.btnExit}
+            onPress={() => setModalUserForm(false)}
+          >
+            <Text style={styles.btnTextExit}>X Cerrar</Text>
+          </Pressable>
+
           <View style={styles.campo}>
-            <Text style={styles.text}>Nuevo usuario</Text>
             <TextInput
               placeholder="Nombre completo"
               placeholderTextColor={"#F8F9F9"}
               style={styles.input}
+              value={userName}
+              onChangeText={setUserName}
             ></TextInput>
           </View>
 
           <View style={styles.campo}>
-            <Text style={styles.text}>Correo</Text>
             <TextInput
               placeholder="@autonoma.edu.co"
               placeholderTextColor={"#F8F9F9"}
               style={styles.input}
               keyboardType="email-address"
+              value={userEmail}
+              onChangeText={setUserEmail}
             ></TextInput>
           </View>
           <View style={styles.campo}>
-            <Text style={styles.text}>Celular</Text>
             <TextInput
               placeholder="Celular"
               placeholderTextColor={"#F8F9F9"}
               style={styles.input}
               keyboardType="phone-pad"
+              value={cellphone}
+              onChangeText={setCellphone}
+              maxLength={10}
             ></TextInput>
           </View>
+
           <View style={styles.campo}>
-            <Pressable onPress={() => setOpen(true)}>
-              <Text style={styles.text}>Fecha inscripción</Text>
-            </Pressable>
             <DatePicker
-              modal
-              open={open}
-              date={date}
-              mode={"date"}
-              onConfirm={(date) => {
-                setOpen(false);
-                setDate(date);
-              }}
-              onCancel={() => {
-                setOpen(false);
-              }}
-            />
+              date={fecha}
+              locale="es-ES"
+              onDateChange={(date) => setFecha(date)}
+            ></DatePicker>
           </View>
+
+          <View style={styles.campo}>
+            <TextInput
+              placeholder="Dejanos tus comentarios"
+              placeholderTextColor={"#F8F9F9"}
+              style={[styles.input, styles.inputComments]}
+              numberOfLines={6}
+              multiline={true}
+              value={comments}
+              onChangeText={setComments}
+            ></TextInput>
+          </View>
+
+          <Pressable style={styles.btnNewUser}>
+            <Text style={styles.btnTextNewUser} onPress={handleUser}>
+              Agregar
+            </Text>
+          </Pressable>
         </ScrollView>
       </ImageBackground>
     </Modal>
@@ -123,6 +210,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
+    color: "#FFFFFF",
+    fontSize: 17,
   },
   text: {
     fontSize: 20,
@@ -132,5 +221,39 @@ const styles = StyleSheet.create({
   },
   campo: {
     marginHorizontal: 30,
+  },
+  inputComments: {
+    height: 100,
+  },
+  inputDate: {
+    borderRadius: 10,
+    height: 10,
+  },
+  btnExit: {
+    marginVertical: 30,
+    backgroundColor: "#000000c0",
+    marginHorizontal: 30,
+    padding: 20,
+    borderRadius: 10,
+  },
+  btnTextExit: {
+    color: "#FFF",
+    textAlign: "center",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  btnNewUser: {
+    marginVertical: 50,
+    backgroundColor: "#0069a3",
+    paddingVertical: 15,
+    marginHorizontal: 30,
+    borderRadius: 10,
+  },
+  btnTextNewUser: {
+    textAlign: "center",
+    color: "#FFF",
+    textTransform: "uppercase",
+    fontWeight: "700",
+    fontSize: 16,
   },
 });
