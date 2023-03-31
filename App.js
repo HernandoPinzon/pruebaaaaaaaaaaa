@@ -8,6 +8,7 @@ import {
   Text,
   FlatList,
 } from "react-native";
+
 export default function App() {
   const [modalUserForm, setModalUserForm] = useState(false);
   /* Creamos un array vacío para listar los usuarios */
@@ -16,10 +17,8 @@ export default function App() {
   const [user, setUser] = useState({});
 
   const editUser = (id) => {
-    console.log("Usuario leido por App.js", id);
     /* Consultamos en el array de usuarios registrados el id */
     const editUser = registeredUsers.filter((user) => user.id === id);
-    console.log("El array paciente que el filter obtiene es ", editUser);
     setUser(editUser[0]);
     console.log('No necesitamos el array, sólo el objeto', editUser[0])
   };

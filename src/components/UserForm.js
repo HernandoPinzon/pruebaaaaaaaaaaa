@@ -29,10 +29,9 @@ export const UserForm = ({
 
   /* Como segundo parametro un array vacio: se ejecuta una sola vez */
   useEffect(() => {
-    console.log("Entre al useEffect");
-    console.log("info del objeto user" + userObj.id);
-
+    console.log(Object.keys(userObj));
     if (Object.keys(userObj).length > 0) {
+      /* ["userName", "userEmail", "cellphone", "fecha", "comments", "id"] */
       console.log("Entre al condicional del useEffect");
       setId(userObj.id);
       setUserName(userObj.userName);
@@ -62,7 +61,7 @@ export const UserForm = ({
       // Editar
       newUser.id = id;
       console.log("Editando", newUser);
-      const userEdited =  
+      /* const userEdited = registeredUsers.map() */
       return;
     } else {
       // Nuevo registro
