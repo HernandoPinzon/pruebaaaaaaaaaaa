@@ -10,11 +10,23 @@ import {
 } from "react-native";
 
 export default function App() {
+  //Form para modal de movies
+  const [modalMoviesForm, setModalMoviesForm] = useState(false);
+  //array de peliculas
+  const [registeredMovies, setRegisteredMovies] = useState([]);
   const [modalUserForm, setModalUserForm] = useState(false);
   /* Creamos un array vacío para listar los usuarios */
   const [registeredUsers, setRegisteredUsers] = useState([]);
   /* Creamos un objeto vacío que luego contendra la info de un user */
   const [user, setUser] = useState({});
+
+  //editar peliculas
+  const editMovie = (id) => {
+    /* Consultamos en el array de peliculas registradas el id */
+    const editMovie = registeredMovies.filter((movie) => movie.id === id);
+    setMovie(editMovie[0]);
+    console.log('No necesitamos el array, sólo el objeto', editMovie[0])
+  }
 
   const editUser = (id) => {
     /* Consultamos en el array de usuarios registrados el id */
