@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
-export const User = ({ item, setModalUserForm, editUser, deleteUser }) => {
-  const { userName, date, id } = item;
+export const Movie = ({ item, setModalMoviesForm, editMovie, deleteMovie }) => {
+  const { title, releaseYear, id } = item;
   const dateFormate = (date) => {
     const newDate = new Date(date);
     const optionsFormate = {
@@ -15,15 +15,16 @@ export const User = ({ item, setModalUserForm, editUser, deleteUser }) => {
   return (
     <ScrollView>
       <View style={styles.content}>
-        <Text style={styles.label}>Estudiante:</Text>
-        <Text style={styles.text}>{userName}</Text>
-        <Text style={styles.date_format}>{dateFormate(date)}</Text>
+        <Text style={styles.label}>Movie:</Text>
+        <Text style={styles.text}>{title}</Text>
+        <Text style={styles.label}>Estreno:</Text>
+        <Text style={styles.date_format}>{dateFormate(releaseYear)}</Text>
         <View style={styles.buttons}>
           <Pressable
             style={[styles.btn, styles.btnEdit]}
             onPress={() => {
-              setModalUserForm(true)
-              editUser(id)
+              setModalMoviesForm(true)
+              editMovie(id)
             }}
           >
             <Text style={styles.btnText}>Editar</Text>
@@ -33,7 +34,7 @@ export const User = ({ item, setModalUserForm, editUser, deleteUser }) => {
               style={styles.btnText}
               onPress={() => {
                 //TODO: Delete user
-                deleteUser(id)
+                deleteMovie(id)
               }}
             >
             Eliminar</Text>

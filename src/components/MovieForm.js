@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import SelectDropdown from 'react-native-select-dropdown'
+
 import {
   Image,
   Modal,
@@ -10,82 +12,89 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  Button,
 } from "react-native";
+
 import DatePicker from "react-native-date-picker";
 
 export const MovieForm = ({
-  modalUserForm,
-  setModalUserForm,
-  registeredUsers,
-  setRegisteredUsers,
-  user: userObj,
+  modalMoviesForm,
+  setModalMoviesForm,
+  registeredMovies,
+  setRegisteredMovies,
+  movie: userObj,
+  setMovie
 }) => {
-  const [fecha, setFecha] = useState(new Date());
+  const genres = ["Accion", "Comedia", "Romance", "Drama", "Terror", "Fantasia"];
   const [id, setId] = useState("");
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [cellphone, setCellphone] = useState("");
-  const [comments, setComments] = useState("");
+  const [title, setTitle] = useState('');
+  const [director, setDirector] = useState('');
+  const [releaseYear, setReleaseYear] = useState(new Date());
+  const [genre, setGenre] = useState('');
+  const [actors, setActors] = useState('');
+  const [synopsis, setSynopsis] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   /* Como segundo parametro un array vacio: se ejecuta una sola vez */
   useEffect(() => {
     console.log(Object.keys(userObj));
     if (Object.keys(userObj).length > 0) {
-      /* ["userName", "userEmail", "cellphone", "fecha", "comments", "id"] */
       console.log("Entre al condicional del useEffect");
       setId(userObj.id);
-      setUserName(userObj.userName);
-      setUserEmail(userObj.userEmail);
-      setCellphone(userObj.cellphone);
-      setComments(userObj.comments);
-      setFecha(userObj.fecha);
+      setTitle(userObj.title);
+      setDirector(userObj.director);
+      setGenre(userObj.genre);
+      setSynopsis(userObj.synopsis);
+      setReleaseYear(userObj.releaseYear);
+      setActors(userObj.actors);
     }
   }, [userObj]);
 
   const handleUser = () => {
-    if ([userName, userEmail, cellphone, comments].includes("")) {
+    if ([title, director, genre, synopsis, actors].includes("")) {
       Alert.alert("Error", "Hay campos sin diligenciar");
       return;
     }
     /* Creamos un nuevo objeto con la información del usuario */
     const newUser = {
-      /* Creamos un id ficticio a partir de la fecha */
-      userName,
-      userEmail,
-      cellphone,
-      fecha,
-      comments,
+      title,
+      director,
+      genre,
+      releaseYear,
+      synopsis,
+      actors
     };
 
     if (id) {
       // Editar
       newUser.id = id;
-      console.log("Editando", newUser);
-      /* const userEdited = registeredUsers.map() */
-      return;
+      console.log(registeredMovies)
+      const newUsers = registeredMovies.map((user) => {
+        return user.id === id ? newUser : user;
+      });
+      setRegisteredMovies(newUsers);
+      setMovie({});
     } else {
       // Nuevo registro
       newUser.id = Date.now();
-      setRegisteredUsers([...registeredUsers, newUser]);
+      setRegisteredMovies([...registeredMovies, newUser]);
     }
-
-    /* Hace una copia del array de users y le agrega el nuevo */
-    setRegisteredUsers([...registeredUsers, newUser]);
-    setModalUserForm(!modalUserForm);
+    setModalMoviesForm(!modalMoviesForm);
     /* Se limpian los campos para que no quede el último registro */
     setId("");
-    setUserName("");
-    setUserEmail("");
-    setCellphone("");
-    setFecha(new Date());
-    setComments("");
+    setTitle("");
+    setDirector("");
+    setGenre("");
+    setReleaseYear(new Date());
+    setSynopsis("");
+    setActors("");
   };
 
   return (
-    <Modal animationType="slide" visible={modalUserForm}>
+    <Modal animationType="slide" visible={modalMoviesForm}>
       <ImageBackground
         style={styles.backCover}
-        source={require("../assets/jpg/dev2.jpg")}
+        source={require("../assets/jpg/cine.jpg")}
       >
         <Image
           style={styles.image}
@@ -93,66 +102,92 @@ export const MovieForm = ({
         />
         <ScrollView>
           <Text style={styles.title}>
-            Inscripción {""}
-            <Text style={styles.titleBold}>Vacaciones UAM</Text>
+            Registro de peliculas {""}
+            <Text style={styles.netflixText}>NETFLIX</Text>
           </Text>
 
           <Pressable
             style={styles.btnExit}
-            onPress={() => setModalUserForm(false)}
+            onPress={() => setModalMoviesForm(false)}
           >
             <Text style={styles.btnTextExit}>X Cerrar</Text>
           </Pressable>
 
           <View style={styles.campo}>
             <TextInput
-              placeholder="Nombre completo"
+              placeholder="Titulo pelicula"
               placeholderTextColor={"#F8F9F9"}
               style={styles.input}
-              value={userName}
-              onChangeText={setUserName}
+              value={title}
+              onChangeText={setTitle}
             ></TextInput>
           </View>
 
           <View style={styles.campo}>
             <TextInput
-              placeholder="@autonoma.edu.co"
+              placeholder="Director"
               placeholderTextColor={"#F8F9F9"}
               style={styles.input}
-              keyboardType="email-address"
-              value={userEmail}
-              onChangeText={setUserEmail}
+              value={director}
+              onChangeText={setDirector}
             ></TextInput>
           </View>
           <View style={styles.campo}>
-            <TextInput
-              placeholder="Celular"
-              placeholderTextColor={"#F8F9F9"}
-              style={styles.input}
-              keyboardType="phone-pad"
-              value={cellphone}
-              onChangeText={setCellphone}
-              maxLength={10}
-            ></TextInput>
+            <SelectDropdown
+              defaultButtonText="Selecciona un genero"
+              buttonStyle={{width: 200, height: 50, backgroundColor: '#F8F9F9', borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}
+              buttonTextStyle={{color: '#000', fontSize: 16}}
+              data={genres}
+              onSelect={(selectedItem) => {
+                setGenre(selectedItem)
+              }}
+            />
           </View>
 
           <View style={styles.campo}>
-            <DatePicker
-              date={fecha}
-              locale="es-ES"
-              onDateChange={(date) => setFecha(date)}
-            ></DatePicker>
+            <Pressable
+            style={{width: 200, height: 50, backgroundColor: '#F8F9F9', borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text>
+                Fecha estreno
+              </Text>
+            </Pressable>
           </View>
+          <Modal visible={showDatePicker} animationType="slide" >
+            <View style={styles.modal}>
+              <Text style={styles.modalTitle}>Selecciona una fecha</Text>
+              <DatePicker 
+                mode="date"
+                date={releaseYear}
+                locale="es-ES"
+                onDateChange={(date) => setReleaseYear(date)}
+              />
+              <Pressable style={styles.btnNewUser} onPress={() => setShowDatePicker(false)}>
+                <Text style={styles.btnTextNewUser}>Aceptar</Text>
+              </Pressable>
+            </View>
+          </Modal>
 
           <View style={styles.campo}>
             <TextInput
-              placeholder="Dejanos tus comentarios"
+              placeholder="Sinopsis"
               placeholderTextColor={"#F8F9F9"}
               style={[styles.input, styles.inputComments]}
               numberOfLines={6}
               multiline={true}
-              value={comments}
-              onChangeText={setComments}
+              value={synopsis}
+              onChangeText={setSynopsis}
+            ></TextInput>
+          </View>
+
+          <View style={styles.campo}>
+            <TextInput
+              placeholder="Actores"
+              placeholderTextColor={"#F8F9F9"}
+              style={styles.input}
+              value={actors}
+              onChangeText={setActors}
             ></TextInput>
           </View>
 
@@ -168,8 +203,16 @@ export const MovieForm = ({
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
+  },
+  modal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9F9'
+
   },
   image: {
     margin: 15,
@@ -203,6 +246,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     fontWeight: "600",
     marginBottom: 20,
+  },
+  netflixText: {
+    color: "#e50914",
+    fontWeight: "bold",
+
   },
   input: {
     backgroundColor: "#000000c0",

@@ -19,6 +19,7 @@ export const UserForm = ({
   registeredUsers,
   setRegisteredUsers,
   user: userObj,
+  setUser
 }) => {
   const [fecha, setFecha] = useState(new Date());
   const [id, setId] = useState("");
@@ -29,10 +30,8 @@ export const UserForm = ({
 
   /* Como segundo parametro un array vacio: se ejecuta una sola vez */
   useEffect(() => {
-    console.log(Object.keys(userObj));
     if (Object.keys(userObj).length > 0) {
       /* ["userName", "userEmail", "cellphone", "fecha", "comments", "id"] */
-      console.log("Entre al condicional del useEffect");
       setId(userObj.id);
       setUserName(userObj.userName);
       setUserEmail(userObj.userEmail);
@@ -60,17 +59,20 @@ export const UserForm = ({
     if (id) {
       // Editar
       newUser.id = id;
-      console.log("Editando", newUser);
-      /* const userEdited = registeredUsers.map() */
-      return;
+      console.log(registeredUsers)
+      const newUsers = registeredUsers.map((user) => {
+        console.log("user", user);
+        console.log("id", id)
+        return user.id === id ? newUser : user;
+      });
+      setRegisteredUsers(newUsers);
+      console.log("Arreglo",newUsers);
+      setUser({});
     } else {
       // Nuevo registro
       newUser.id = Date.now();
       setRegisteredUsers([...registeredUsers, newUser]);
     }
-
-    /* Hace una copia del array de users y le agrega el nuevo */
-    setRegisteredUsers([...registeredUsers, newUser]);
     setModalUserForm(!modalUserForm);
     /* Se limpian los campos para que no quede el último registro */
     setId("");
@@ -111,6 +113,16 @@ export const UserForm = ({
               style={styles.input}
               value={userName}
               onChangeText={setUserName}
+              onPress={() => {
+                setModalUserForm(false);
+                setUser({});
+                setId("");
+                setUserName("");
+                setUserEmail("");
+                setCellphone("");
+                setFecha(new Date());
+                setComments("");
+              }}
             ></TextInput>
           </View>
 
